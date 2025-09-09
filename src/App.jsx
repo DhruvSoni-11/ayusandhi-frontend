@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, ArrowLeft, Book, Globe, Heart, Clock, Tag, FileText, TreePine, AlertCircle, Loader2 } from 'lucide-react';
+import { Search, ArrowLeft, Book, Globe, Heart, Clock, Tag, FileText, TreePine, AlertCircle, Loader2, User, Shield, Award, Info } from 'lucide-react';
 
 // API Service
 const API_BASE_URL = 'https://namaste-te4u.onrender.com/api/v1/terminology';
@@ -12,7 +12,6 @@ const apiService = {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      // Handle both flat array and nested object responses
       return data.results || data || [];
     } catch (error) {
       console.error('Search API error:', error);
@@ -51,21 +50,87 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
+// AyuSandhi Logo Component
+const AyuSandhiLogo = () => (
+  <div className="flex items-center space-x-3">
+    <div className="relative">
+      <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+        <TreePine className="w-6 h-6 text-white" />
+      </div>
+      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+        <Heart className="w-2 h-2 text-white" />
+      </div>
+    </div>
+    <div>
+      <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+        AyuSandhi
+      </h1>
+      <p className="text-xs text-gray-600 font-medium">Medical Terminology System</p>
+    </div>
+  </div>
+);
+
+// Government Header Component
+const GovernmentHeader = () => (
+  <div className="bg-gradient-to-r from-orange-50 to-red-50 border-b-2 border-orange-200">
+    <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-8 h-8 bg-orange-600 rounded flex items-center justify-center">
+            <Shield className="w-4 h-4 text-white" />
+          </div>
+          <div className="text-sm">
+            <p className="font-semibold text-orange-800">Ministry of AYUSH</p>
+            <p className="text-orange-600">Government of India</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2 text-sm text-orange-700">
+          <Award className="w-4 h-4" />
+          <span className="font-medium">National Digital Health Mission</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Doctor Information Panel
+const DoctorInfoPanel = () => (
+  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div className="flex items-start space-x-3">
+      <User className="w-5 h-5 text-blue-600 mt-0.5" />
+      <div>
+        <h3 className="font-semibold text-blue-900 mb-2">For Healthcare Professionals</h3>
+        <div className="text-sm text-blue-800 space-y-1">
+          <p>• Standardized Ayurveda-Biomedicine terminology mapping</p>
+          <p>• ICD-11 compliant coding system</p>
+          <p>• Evidence-based clinical references</p>
+          <p>• Multi-language support (English, Hindi, Sanskrit)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 // Search Bar Component
-const SearchBar = ({ value, onChange, onFocus, placeholder = "Search medical terminology..." }) => {
+const SearchBar = ({ value, onChange, onFocus, placeholder = "Search symptoms, conditions, treatments..." }) => {
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className="relative w-full max-w-4xl mx-auto">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onFocus={onFocus}
           placeholder={placeholder}
-          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg text-lg focus:border-blue-500 focus:outline-none transition-colors bg-white shadow-sm"
+          className="w-full pl-14 pr-4 py-4 border-2 border-gray-200 rounded-xl text-lg focus:border-orange-500 focus:outline-none transition-all bg-white shadow-sm hover:shadow-md"
           aria-label="Search medical terminology"
         />
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            Press Enter to search
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -86,10 +151,10 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
 
   if (isLoading) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 p-4 z-50">
+      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl mt-2 p-6 z-50">
         <div className="flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-500 mr-2" />
-          <span className="text-gray-600">Searching...</span>
+          <Loader2 className="w-6 h-6 animate-spin text-orange-500 mr-3" />
+          <span className="text-gray-600 font-medium">Searching terminology database...</span>
         </div>
       </div>
     );
@@ -98,36 +163,48 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
   if (!suggestions || suggestions.length === 0) return null;
 
   return (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50">
+    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl mt-2 max-h-96 overflow-y-auto z-50">
+      <div className="p-2 border-b bg-gray-50 rounded-t-xl">
+        <p className="text-sm text-gray-600 font-medium">Found {suggestions.length} results</p>
+      </div>
       <ul ref={listRef} role="listbox" aria-label="Search suggestions">
         {suggestions.map((suggestion, index) => (
           <li
             key={suggestion.namaste_code || suggestion._id || index}
             role="option"
             aria-selected={index === selectedIndex}
-            className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors ${
-              index === selectedIndex ? 'bg-blue-50 border-blue-200' : ''
+            className={`px-6 py-4 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-orange-50 transition-colors ${
+              index === selectedIndex ? 'bg-orange-100 border-orange-200' : ''
             }`}
             onClick={() => onSelect(suggestion)}
             onKeyDown={(e) => onKeyDown(e, index)}
             tabIndex={0}
           >
-            <div className="font-medium text-gray-900 mb-1">
+            <div className="font-semibold text-gray-900 mb-2">
               {suggestion.display_name || 'No display name'}
             </div>
-            {suggestion.english_name && (
-              <div className="text-sm text-gray-600 mb-1">
-                English: {suggestion.english_name}
-              </div>
-            )}
-            {suggestion.hindi_name && (
-              <div className="text-sm text-gray-600 mb-1">
-                Hindi: {suggestion.hindi_name}
-              </div>
-            )}
+            <div className="grid md:grid-cols-2 gap-2 text-sm">
+              {suggestion.english_name && (
+                <div className="text-gray-700">
+                  <span className="font-medium text-blue-600">English:</span> {suggestion.english_name}
+                </div>
+              )}
+              {suggestion.hindi_name && (
+                <div className="text-gray-700">
+                  <span className="font-medium text-green-600">हिंदी:</span> {suggestion.hindi_name}
+                </div>
+              )}
+            </div>
             {suggestion.namaste_code && (
-              <div className="text-xs text-gray-500">
-                Code: {suggestion.namaste_code}
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-mono">
+                  Code: {suggestion.namaste_code}
+                </span>
+                {suggestion.category && (
+                  <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                    {suggestion.category}
+                  </span>
+                )}
               </div>
             )}
           </li>
@@ -137,17 +214,19 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
   );
 };
 
-// Terminology Card Component
+// Enhanced Terminology Card Component
 const TerminologyCard = ({ terminology, onBack }) => {
   if (!terminology) return null;
 
-  const InfoSection = ({ title, children, icon: Icon }) => (
-    <div className="mb-6">
-      <div className="flex items-center mb-3">
-        {Icon && <Icon className="w-5 h-5 text-blue-600 mr-2" />}
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+  const InfoSection = ({ title, children, icon: Icon, bgColor = "bg-gray-50" }) => (
+    <div className="mb-8">
+      <div className="flex items-center mb-4">
+        {Icon && <Icon className="w-6 h-6 text-orange-600 mr-3" />}
+        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
       </div>
-      <div className="text-gray-700">{children}</div>
+      <div className={`${bgColor} rounded-lg p-5 border border-gray-200`}>
+        {children}
+      </div>
     </div>
   );
 
@@ -173,19 +252,23 @@ const TerminologyCard = ({ terminology, onBack }) => {
     if (!mappings) return null;
     
     return (
-      <div className="space-y-2">
+      <div className="space-y-4">
         {mappings.tm2_code && (
-          <div className="bg-gray-50 rounded p-3">
-            <div className="font-medium">TM2 Mapping:</div>
-            <div className="text-sm">Code: {mappings.tm2_code}</div>
-            {mappings.tm2_display && <div className="text-sm">Display: {mappings.tm2_display}</div>}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="font-bold text-blue-900 mb-2">TM2 Classification</div>
+            <div className="text-sm space-y-1">
+              <div><span className="font-medium">Code:</span> {mappings.tm2_code}</div>
+              {mappings.tm2_display && <div><span className="font-medium">Display:</span> {mappings.tm2_display}</div>}
+            </div>
           </div>
         )}
         {mappings.biomedicine_code && (
-          <div className="bg-gray-50 rounded p-3">
-            <div className="font-medium">Biomedicine Mapping:</div>
-            <div className="text-sm">Code: {mappings.biomedicine_code}</div>
-            {mappings.biomedicine_display && <div className="text-sm">Display: {mappings.biomedicine_display}</div>}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="font-bold text-green-900 mb-2">Biomedicine Mapping</div>
+            <div className="text-sm space-y-1">
+              <div><span className="font-medium">Code:</span> {mappings.biomedicine_code}</div>
+              {mappings.biomedicine_display && <div><span className="font-medium">Display:</span> {mappings.biomedicine_display}</div>}
+            </div>
           </div>
         )}
       </div>
@@ -193,80 +276,97 @@ const TerminologyCard = ({ terminology, onBack }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <button
         onClick={onBack}
-        className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors"
+        className="flex items-center text-orange-600 hover:text-orange-800 mb-8 transition-colors font-medium"
         aria-label="Back to search"
       >
         <ArrowLeft className="w-5 h-5 mr-2" />
         Back to Search
       </button>
 
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {terminology.display_name || 'No display name available'}
-          </h1>
-          <div className="grid md:grid-cols-2 gap-4">
-            {terminology.english_name && (
-              <div>
-                <span className="font-medium text-gray-600">English Name:</span>
-                <p className="text-gray-900">{terminology.english_name}</p>
+      <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8">
+        <div className="mb-10 border-b pb-8">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                {terminology.display_name || 'No display name available'}
+              </h1>
+              <div className="grid md:grid-cols-3 gap-6">
+                {terminology.english_name && (
+                  <div>
+                    <span className="font-semibold text-blue-600 block mb-1">English Name:</span>
+                    <p className="text-gray-900 text-lg">{terminology.english_name}</p>
+                  </div>
+                )}
+                {terminology.hindi_name && (
+                  <div>
+                    <span className="font-semibold text-green-600 block mb-1">हिंदी नाम:</span>
+                    <p className="text-gray-900 text-lg">{terminology.hindi_name}</p>
+                  </div>
+                )}
+                {terminology.namaste_code && (
+                  <div>
+                    <span className="font-semibold text-orange-600 block mb-1">NAMASTE Code:</span>
+                    <p className="text-gray-900 font-mono text-lg bg-gray-100 px-3 py-2 rounded">{terminology.namaste_code}</p>
+                  </div>
+                )}
               </div>
-            )}
-            {terminology.hindi_name && (
-              <div>
-                <span className="font-medium text-gray-600">Hindi Name:</span>
-                <p className="text-gray-900">{terminology.hindi_name}</p>
+            </div>
+            <div className="ml-8">
+              <div className="bg-orange-100 border border-orange-300 rounded-lg p-4 text-center">
+                <Shield className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-orange-800">Government</p>
+                <p className="text-sm text-orange-700">Verified</p>
               </div>
-            )}
-            {terminology.namaste_code && (
-              <div>
-                <span className="font-medium text-gray-600">NAMASTE Code:</span>
-                <p className="text-gray-900 font-mono">{terminology.namaste_code}</p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div>
-            <InfoSection title="Classification" icon={Tag}>
-              <div className="space-y-2">
+        <div className="grid xl:grid-cols-2 gap-10">
+          <div className="space-y-8">
+            <InfoSection title="Medical Classification" icon={Tag} bgColor="bg-orange-50">
+              <div className="space-y-3">
                 {terminology.medical_system && (
-                  <p><span className="font-medium">Medical System:</span> {terminology.medical_system}</p>
+                  <p className="flex justify-between"><span className="font-semibold">Medical System:</span> <span>{terminology.medical_system}</span></p>
                 )}
                 {terminology.category && (
-                  <p><span className="font-medium">Category:</span> {terminology.category}</p>
+                  <p className="flex justify-between"><span className="font-semibold">Category:</span> <span>{terminology.category}</span></p>
                 )}
                 {terminology.subcategory && (
-                  <p><span className="font-medium">Subcategory:</span> {terminology.subcategory}</p>
+                  <p className="flex justify-between"><span className="font-semibold">Subcategory:</span> <span>{terminology.subcategory}</span></p>
                 )}
               </div>
             </InfoSection>
 
             {terminology.definition && (
-              <InfoSection title="Definition" icon={FileText}>
-                <p className="leading-relaxed">{terminology.definition}</p>
+              <InfoSection title="Clinical Definition" icon={FileText} bgColor="bg-blue-50">
+                <p className="leading-relaxed text-gray-800 text-lg">{terminology.definition}</p>
               </InfoSection>
             )}
 
             {terminology.synonyms && terminology.synonyms.length > 0 && (
-              <InfoSection title="Synonyms" icon={Book}>
-                <p>{formatArray(terminology.synonyms)}</p>
+              <InfoSection title="Alternative Names" icon={Book} bgColor="bg-green-50">
+                <div className="flex flex-wrap gap-2">
+                  {terminology.synonyms.map((synonym, index) => (
+                    <span key={index} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {synonym}
+                    </span>
+                  ))}
+                </div>
               </InfoSection>
             )}
           </div>
 
-          <div>
+          <div className="space-y-8">
             {terminology.clinical_features && terminology.clinical_features.length > 0 && (
-              <InfoSection title="Clinical Features" icon={Heart}>
-                <ul className="space-y-1">
+              <InfoSection title="Clinical Features" icon={Heart} bgColor="bg-red-50">
+                <ul className="space-y-3">
                   {terminology.clinical_features.map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      {feature}
+                      <span className="w-3 h-3 bg-red-500 rounded-full mt-2 mr-4 flex-shrink-0"></span>
+                      <span className="text-gray-800 font-medium">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -274,82 +374,120 @@ const TerminologyCard = ({ terminology, onBack }) => {
             )}
 
             {terminology.traditional_symptoms && terminology.traditional_symptoms.length > 0 && (
-              <InfoSection title="Traditional Symptoms" icon={TreePine}>
-                <ul className="space-y-1">
+              <InfoSection title="Traditional Symptoms" icon={TreePine} bgColor="bg-emerald-50">
+                <ul className="space-y-3">
                   {terminology.traditional_symptoms.map((symptom, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      {symptom}
+                      <span className="w-3 h-3 bg-emerald-500 rounded-full mt-2 mr-4 flex-shrink-0"></span>
+                      <span className="text-gray-800 font-medium">{symptom}</span>
                     </li>
                   ))}
                 </ul>
               </InfoSection>
             )}
 
-            {terminology.severity_levels && terminology.severity_levels.length > 0 && (
-              <InfoSection title="Severity Levels" icon={AlertCircle}>
-                <p>{formatArray(terminology.severity_levels)}</p>
-              </InfoSection>
-            )}
-
             {terminology.dosha_involvement && (
-              <InfoSection title="Dosha Involvement" icon={Globe}>
-                <p>{formatDoshaInvolvement(terminology.dosha_involvement)}</p>
+              <InfoSection title="Ayurvedic Analysis" icon={Globe} bgColor="bg-purple-50">
+                <div className="text-gray-800 font-medium text-lg">
+                  {formatDoshaInvolvement(terminology.dosha_involvement)}
+                </div>
               </InfoSection>
             )}
           </div>
         </div>
 
         {terminology.icd11_mappings && (
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <InfoSection title="ICD-11 Mappings" icon={Globe}>
+          <div className="mt-10 pt-8 border-t border-gray-200">
+            <InfoSection title="International Classification (ICD-11)" icon={Globe} bgColor="bg-indigo-50">
               {formatICD11Mappings(terminology.icd11_mappings)}
             </InfoSection>
           </div>
         )}
 
         {terminology.who_international_terminology && (
-          <div className="mt-6">
-            <InfoSection title="WHO International Terminology" icon={Globe}>
-              <div className="bg-blue-50 rounded-lg p-4">
+          <div className="mt-8">
+            <InfoSection title="WHO International Terminology" icon={Award} bgColor="bg-yellow-50">
+              <div className="space-y-3">
                 {terminology.who_international_terminology.code && (
-                  <p className="font-mono text-sm mb-2">Code: {terminology.who_international_terminology.code}</p>
+                  <p className="font-mono text-sm bg-white p-3 rounded border">
+                    <span className="font-semibold">Code:</span> {terminology.who_international_terminology.code}
+                  </p>
                 )}
                 {terminology.who_international_terminology.display && (
-                  <p className="font-medium mb-2">Display: {terminology.who_international_terminology.display}</p>
+                  <p className="font-medium text-lg">{terminology.who_international_terminology.display}</p>
                 )}
                 {terminology.who_international_terminology.definition && (
-                  <p className="text-sm">Definition: {terminology.who_international_terminology.definition}</p>
+                  <p className="text-gray-700">{terminology.who_international_terminology.definition}</p>
                 )}
               </div>
             </InfoSection>
           </div>
         )}
 
-        {terminology.hierarchy && (
-          <div className="mt-6">
-            <InfoSection title="Hierarchy" icon={TreePine}>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <pre className="text-sm whitespace-pre-wrap">{JSON.stringify(terminology.hierarchy, null, 2)}</pre>
-              </div>
-            </InfoSection>
+        <div className="mt-10 pt-8 border-t border-gray-200 flex justify-between items-center">
+          <div className="flex items-center text-gray-600">
+            <Clock className="w-5 h-5 mr-2" />
+            <span className="font-medium">Last Updated: {terminology.last_updated ? new Date(terminology.last_updated).toLocaleDateString() : 'Not specified'}</span>
           </div>
-        )}
-
-        <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center text-sm text-gray-500">
-          <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-1" />
-            Last Updated: {terminology.last_updated ? new Date(terminology.last_updated).toLocaleDateString() : 'Not specified'}
-          </div>
-          <div className="flex items-center">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          <div className="flex items-center space-x-4">
+            <span className={`px-4 py-2 rounded-full text-sm font-bold ${
               terminology.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
             }`}>
-              {terminology.status || 'Unknown'}
+              {terminology.status === 'active' ? '✓ Active' : terminology.status || 'Unknown'}
             </span>
+            <div className="flex items-center bg-orange-100 text-orange-800 px-4 py-2 rounded-full">
+              <Shield className="w-4 h-4 mr-2" />
+              <span className="text-sm font-bold">Government Verified</span>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+// Quick Access Cards Component
+const QuickAccessCards = () => {
+  const cards = [
+    {
+      title: "Common Conditions",
+      description: "Frequently searched medical terms",
+      icon: Heart,
+      color: "bg-red-50 border-red-200 text-red-700",
+      examples: ["Fever", "Headache", "Joint Pain"]
+    },
+    {
+      title: "Ayurvedic Terms",
+      description: "Traditional medicine terminology",
+      icon: TreePine,
+      color: "bg-green-50 border-green-200 text-green-700",
+      examples: ["Vata", "Pitta", "Kapha"]
+    },
+    {
+      title: "ICD-11 Codes",
+      description: "International classification codes",
+      icon: Globe,
+      color: "bg-blue-50 border-blue-200 text-blue-700",
+      examples: ["WHO-FIC", "TM2", "Biomedicine"]
+    }
+  ];
+
+  return (
+    <div className="grid md:grid-cols-3 gap-6 mt-8">
+      {cards.map((card, index) => (
+        <div key={index} className={`${card.color} border-2 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer`}>
+          <div className="flex items-center mb-4">
+            <card.icon className="w-8 h-8 mr-3" />
+            <h3 className="font-bold text-lg">{card.title}</h3>
+          </div>
+          <p className="text-sm mb-4 opacity-80">{card.description}</p>
+          <div className="space-y-1">
+            {card.examples.map((example, idx) => (
+              <p key={idx} className="text-xs opacity-70">• {example}</p>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -382,7 +520,6 @@ const App = () => {
       const results = await apiService.search(query);
       console.log('Search results:', results);
       
-      // Ensure we have an array
       const resultsArray = Array.isArray(results) ? results : [];
       setSuggestions(resultsArray);
       setShowSuggestions(resultsArray.length > 0);
@@ -392,7 +529,7 @@ const App = () => {
       }
     } catch (err) {
       console.error('Search error:', err);
-      setError('Failed to search terminology. Please check your connection and try again.');
+      setError('Unable to connect to the terminology database. Please check your internet connection and try again.');
       setSuggestions([]);
       setShowSuggestions(false);
     } finally {
@@ -476,7 +613,6 @@ const App = () => {
     }
   };
 
-  // Attach keydown listener to document
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -485,21 +621,30 @@ const App = () => {
   }, [handleKeyDown]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 text-center">
-            NAMASTE Terminology System
-          </h1>
-          <p className="text-gray-600 text-center mt-2">
-            National Ayurveda Medical Standardized Terminology Ecosystem
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      {/* <GovernmentHeader /> */}
+      
+      <header className="bg-white shadow-lg border-b-4 border-orange-500">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between">
+            <AyuSandhiLogo />
+            <div className="text-right">
+              <h2 className="text-xl font-bold text-gray-900">
+                NAMASTE Terminology System
+              </h2>
+              <p className="text-gray-600 font-medium">
+                National Ayurveda Medical Standardized Terminology Ecosystem
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {currentView === 'search' ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
+            <DoctorInfoPanel />
+            
             <div className="relative">
               <SearchBar
                 value={searchTerm}
@@ -518,63 +663,72 @@ const App = () => {
             </div>
 
             {error && (
-              <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="max-w-4xl mx-auto bg-red-50 border-2 border-red-200 rounded-xl p-6">
                 <div className="flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-                  <span className="text-red-700">{error}</span>
+                  <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
+                  <div>
+                    <h3 className="font-semibold text-red-800 mb-1">Connection Error</h3>
+                    <span className="text-red-700">{error}</span>
+                  </div>
                 </div>
               </div>
             )}
 
             {!searchTerm && !error && (
-              <div className="text-center py-12">
-                <Book className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h2 className="text-xl font-medium text-gray-600 mb-2">
-                  Search Medical Terminology
-                </h2>
-                <p className="text-gray-500 mb-4">
-                  Enter a term to search the NAMASTE terminology database
-                </p>
-                <p className="text-sm text-gray-400">
-                  Try searching for terms like "fever", "diabetes", or "headache"
-                </p>
-              </div>
-            )}
-
-            {searchTerm && !isLoading && suggestions.length === 0 && !error && (
-              <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">
-                  No results found
-                </h3>
-                <p className="text-gray-500">
-                  Try adjusting your search terms or check the spelling
-                </p>
+              <div className="text-center py-16">
+                <div className="mb-8">
+                  <TreePine className="w-24 h-24 text-orange-300 mx-auto mb-6" />
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                    Welcome to AyuSandhi
+                  </h2>
+                  <p className="text-xl text-gray-600 mb-2">
+                    Advanced Medical Terminology Search for Healthcare Professionals
+                  </p>
+                  <p className="text-gray-500 max-w-2xl mx-auto">
+                    Access standardized Ayurveda-Biomedicine terminology with ICD-11 mapping, multi-language support, and evidence-based clinical references approved by the Ministry of AYUSH.
+                  </p>
+                </div>
+                
+                <QuickAccessCards />
+                
+                                <div className="mt-12 bg-gradient-to-r from-orange-100 to-red-100 rounded-xl p-8 border border-orange-200">
+                  <div className="flex items-center justify-between flex-col md:flex-row space-y-4 md:space-y-0">
+                    <div className="text-left">
+                      <h3 className="text-xl font-bold text-orange-800">Empowering Traditional Knowledge</h3>
+                      <p className="text-sm text-orange-700 mt-1 max-w-xl">
+                        This platform bridges Ayurveda with modern clinical systems to enhance holistic healthcare delivery.
+                      </p>
+                    </div>
+                    <div className="flex space-x-4">
+                      <button
+                        onClick={() => setSearchTerm('Fever')}
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium transition-colors"
+                      >
+                        Try "Fever"
+                      </button>
+                      <button
+                        onClick={() => setSearchTerm('Vata')}
+                        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-medium transition-colors"
+                      >
+                        Try "Vata"
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         ) : (
-          <div>
-            {isLoading ? (
-              <div className="text-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-                <p className="text-gray-600">Loading terminology details...</p>
-              </div>
-            ) : (
-              <TerminologyCard
-                terminology={selectedTerminology}
-                onBack={handleBackToSearch}
-              />
-            )}
-          </div>
+          <TerminologyCard
+            terminology={selectedTerminology}
+            onBack={handleBackToSearch}
+          />
         )}
       </main>
 
-      <footer className="mt-16 bg-white border-t">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <p className="text-center text-gray-500 text-sm">
-            NAMASTE Terminology System - Government of India Initiative
-          </p>
+      <footer className="bg-white border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
+          &copy; {new Date().getFullYear()} Ministry of AYUSH — National Digital Health Mission. All rights reserved.
         </div>
       </footer>
     </div>
