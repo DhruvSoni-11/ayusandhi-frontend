@@ -58,6 +58,30 @@ const apiService = {
       console.error('Lookup API error:', error);
       throw error;
     }
+  },
+
+  // New enhanced search that combines search and lookup
+  enhancedSearch: async (query) => {
+    try {
+      // First try regular search
+      const searchResults = await apiService.search(query);
+      
+      // If no search results, try direct lookup by code
+      if (!searchResults || searchResults.length === 0) {
+        try {
+          const lookupResult = await apiService.lookup(query);
+          return lookupResult ? [lookupResult] : [];
+        } catch (lookupError) {
+          // If lookup also fails, return empty array
+          return [];
+        }
+      }
+      
+      return searchResults;
+    } catch (error) {
+      console.error('Enhanced search API error:', error);
+      throw error;
+    }
   }
 };
 
@@ -127,9 +151,9 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onFocus={onSearchFocus}
-                placeholder="Search medical terminology..."
+                placeholder="Search medical terminology or enter NAMASTE code..."
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg text-lg focus:border-orange-500 focus:outline-none transition-all bg-white shadow-sm hover:shadow-md"
-                aria-label="Search medical terminology"
+                aria-label="Search medical terminology or lookup by code"
               />
             </div>
           </MotionDiv>
@@ -163,7 +187,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onFocus={onSearchFocus}
-                placeholder="Search medical terminology..."
+                placeholder="Search medical terminology or enter NAMASTE code..."
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all bg-white"
               />
             </div>
@@ -182,8 +206,8 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
   );
 };
 
-// Suggestion List Component
-const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoading }) => {
+// Enhanced Suggestion List Component
+const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoading, searchTerm }) => {
   const listRef = useRef(null);
 
   useEffect(() => {
@@ -200,7 +224,11 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
       <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl mt-2 p-6 z-40">
         <div className="flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-orange-500 mr-3" />
-          <span className="text-gray-600 font-medium">Searching terminology...</span>
+          <span className="text-gray-600 font-medium">
+            {searchTerm && searchTerm.match(/^[A-Z0-9-]+$/i) 
+              ? 'Looking up terminology code...' 
+              : 'Searching terminology...'}
+          </span>
         </div>
       </div>
     );
@@ -208,10 +236,19 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
 
   if (!suggestions || suggestions.length === 0) return null;
 
+  // Check if this looks like a direct lookup result
+  const isDirectLookup = suggestions.length === 1 && searchTerm && 
+                         searchTerm.match(/^[A-Z0-9-]+$/i) && 
+                         suggestions[0].namaste_code === searchTerm.toUpperCase();
+
   return (
     <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl mt-2 max-h-96 overflow-y-auto z-40">
       <div className="p-3 border-b bg-gray-50 rounded-t-xl">
-        <p className="text-sm text-gray-600 font-medium">Found {suggestions.length} results</p>
+        <p className="text-sm text-gray-600 font-medium">
+          {isDirectLookup 
+            ? 'Direct code lookup result' 
+            : `Found ${suggestions.length} result${suggestions.length !== 1 ? 's' : ''}`}
+        </p>
       </div>
       <ul ref={listRef} role="listbox" aria-label="Search suggestions">
         {suggestions.map((suggestion, index) => (
@@ -221,13 +258,18 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
             aria-selected={index === selectedIndex}
             className={`px-6 py-4 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-orange-50 transition-colors ${
               index === selectedIndex ? 'bg-orange-100 border-orange-200' : ''
-            }`}
+            } ${isDirectLookup ? 'bg-blue-50' : ''}`}
             onClick={() => onSelect(suggestion)}
             onKeyDown={(e) => onKeyDown(e, index)}
             tabIndex={0}
           >
-            <div className="font-semibold text-gray-900 mb-2">
+            <div className="font-semibold text-gray-900 mb-2 flex items-center">
               {suggestion.display_name || 'No display name'}
+              {isDirectLookup && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-bold">
+                  Code Match
+                </span>
+              )}
             </div>
             <div className="grid md:grid-cols-2 gap-2 text-sm">
               {suggestion.english_name && (
@@ -243,7 +285,11 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
             </div>
             {suggestion.namaste_code && (
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-mono">
+                <span className={`text-xs px-2 py-1 rounded font-mono ${
+                  isDirectLookup 
+                    ? 'bg-blue-100 text-blue-700 font-bold' 
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
                   Code: {suggestion.namaste_code}
                 </span>
                 {suggestion.category && (
@@ -299,7 +345,7 @@ const HeroSection = () => (
           animate="animate"
           transition={{ duration: 1, delay: 0.3 }}
         >
-         
+ 
         </MotionDiv>
       </div>
     </div>
@@ -613,7 +659,8 @@ const App = () => {
     setError(null);
 
     try {
-      const results = await apiService.search(query);
+      // Use the enhanced search that includes lookup functionality
+      const results = await apiService.enhancedSearch(query);
       const resultsArray = Array.isArray(results) ? results : [];
       setSuggestions(resultsArray);
       setShowSuggestions(resultsArray.length > 0);
@@ -622,7 +669,7 @@ const App = () => {
         setSelectedSuggestion(0);
       }
     } catch (err) {
-      console.error('Search error:', err);
+      console.error('Enhanced search error:', err);
       setError('Unable to connect to the terminology database. Please check your internet connection and try again.');
       setSuggestions([]);
       setShowSuggestions(false);
@@ -652,9 +699,16 @@ const App = () => {
     setShowSuggestions(false);
 
     try {
-      const details = await apiService.lookup(suggestion.namaste_code);
-      setSelectedTerminology(details);
-      setCurrentView('details');
+      // If the suggestion already has full details (from direct lookup), use it directly
+      if (suggestion.definition || suggestion.clinical_features || suggestion.icd11_mappings) {
+        setSelectedTerminology(suggestion);
+        setCurrentView('details');
+      } else {
+        // Otherwise, fetch full details
+        const details = await apiService.lookup(suggestion.namaste_code);
+        setSelectedTerminology(details);
+        setCurrentView('details');
+      }
     } catch (err) {
       console.error('Lookup error:', err);
       setError('Failed to load terminology details. Please try again.');
@@ -732,6 +786,7 @@ return (
           selectedIndex={selectedSuggestion}
           onKeyDown={handleKeyDown}
           isLoading={isLoading}
+          searchTerm={searchTerm}
         />
       )}
     </div>
