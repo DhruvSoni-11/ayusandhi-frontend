@@ -10,7 +10,7 @@ const motionVariants = {
 
 const MotionDiv = ({ children, className, variants, initial, animate, exit, transition, ...props }) => {
   const [isVisible, setIsVisible] = useState(false);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 50);
     return () => clearTimeout(timer);
@@ -46,7 +46,7 @@ const apiService = {
       throw error;
     }
   },
-  
+
   lookup: async (code) => {
     try {
       const response = await fetch(`${API_BASE_URL}/lookup/${encodeURIComponent(code)}`);
@@ -65,7 +65,7 @@ const apiService = {
     try {
       // First try regular search
       const searchResults = await apiService.search(query);
-      
+
       // If no search results, try direct lookup by code
       if (!searchResults || searchResults.length === 0) {
         try {
@@ -76,7 +76,7 @@ const apiService = {
           return [];
         }
       }
-      
+
       return searchResults;
     } catch (error) {
       console.error('Enhanced search API error:', error);
@@ -108,24 +108,30 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
 
   return (
     <nav className="bg-white shadow-lg border-b-4 border-orange-500 sticky top-0 z-50">
-      
+
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <MotionDiv
-            onClick={onLogoClick} 
+            onClick={onLogoClick}
             className="flex items-center space-x-3 cursor-pointer"
             initial="initial"
             animate="animate"
             transition={{ duration: 0.8 }}
           >
             <div className="relative">
-              {/* green gradient circle behind the TreePine icon */}
-              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-700 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <TreePine className="w-7 h-7 text-white" />
+              {/* green gradient circle behind the logo */}
+              <div className="w-26 h-26 rounded-full flex items-center justify-center ">
+                <img
+                  src="/logo.png"
+                  alt="AyuSandhi Logo"
+                  className="w-12 h-12 object-contain"
+                />
               </div>
             </div>
+
+
 
             {/* text part of the logo */}
             <div>
@@ -138,7 +144,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
 
 
           {/* Search Bar - Desktop */}
-          <MotionDiv 
+          <MotionDiv
             className="hidden md:flex flex-1 max-w-2xl mx-8"
             initial="initial"
             animate="animate"
@@ -159,7 +165,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick }) => {
           </MotionDiv>
 
           {/* Navigation Links */}
-          <MotionDiv 
+          <MotionDiv
             className="hidden md:flex items-center space-x-6"
             initial="initial"
             animate="animate"
@@ -225,8 +231,8 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
         <div className="flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-orange-500 mr-3" />
           <span className="text-gray-600 font-medium">
-            {searchTerm && searchTerm.match(/^[A-Z0-9-]+$/i) 
-              ? 'Looking up terminology code...' 
+            {searchTerm && searchTerm.match(/^[A-Z0-9-]+$/i)
+              ? 'Looking up terminology code...'
               : 'Searching terminology...'}
           </span>
         </div>
@@ -237,16 +243,16 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
   if (!suggestions || suggestions.length === 0) return null;
 
   // Check if this looks like a direct lookup result
-  const isDirectLookup = suggestions.length === 1 && searchTerm && 
-                         searchTerm.match(/^[A-Z0-9-]+$/i) && 
-                         suggestions[0].namaste_code === searchTerm.toUpperCase();
+  const isDirectLookup = suggestions.length === 1 && searchTerm &&
+    searchTerm.match(/^[A-Z0-9-]+$/i) &&
+    suggestions[0].namaste_code === searchTerm.toUpperCase();
 
   return (
     <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl mt-2 max-h-96 overflow-y-auto z-40">
       <div className="p-3 border-b bg-gray-50 rounded-t-xl">
         <p className="text-sm text-gray-600 font-medium">
-          {isDirectLookup 
-            ? 'Direct code lookup result' 
+          {isDirectLookup
+            ? 'Direct code lookup result'
             : `Found ${suggestions.length} result${suggestions.length !== 1 ? 's' : ''}`}
         </p>
       </div>
@@ -256,9 +262,8 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
             key={suggestion.namaste_code || suggestion._id || index}
             role="option"
             aria-selected={index === selectedIndex}
-            className={`px-6 py-4 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-orange-50 transition-colors ${
-              index === selectedIndex ? 'bg-orange-100 border-orange-200' : ''
-            } ${isDirectLookup ? 'bg-blue-50' : ''}`}
+            className={`px-6 py-4 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-orange-50 transition-colors ${index === selectedIndex ? 'bg-orange-100 border-orange-200' : ''
+              } ${isDirectLookup ? 'bg-blue-50' : ''}`}
             onClick={() => onSelect(suggestion)}
             onKeyDown={(e) => onKeyDown(e, index)}
             tabIndex={0}
@@ -285,11 +290,10 @@ const SuggestionList = ({ suggestions, onSelect, selectedIndex, onKeyDown, isLoa
             </div>
             {suggestion.namaste_code && (
               <div className="mt-2 flex items-center justify-between">
-                <span className={`text-xs px-2 py-1 rounded font-mono ${
-                  isDirectLookup 
-                    ? 'bg-blue-100 text-blue-700 font-bold' 
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
+                <span className={`text-xs px-2 py-1 rounded font-mono ${isDirectLookup
+                  ? 'bg-blue-100 text-blue-700 font-bold'
+                  : 'bg-gray-100 text-gray-600'
+                  }`}>
                   Code: {suggestion.namaste_code}
                 </span>
                 {suggestion.category && (
@@ -334,7 +338,7 @@ const HeroSection = () => (
             Trusted Healthcare Terminology Platform
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Bridging traditional Ayurvedic wisdom with modern medical standards 
+            Bridging traditional Ayurvedic wisdom with modern medical standards
             through comprehensive terminology mapping and ICD-11 compliance.
           </p>
         </MotionDiv>
@@ -345,7 +349,7 @@ const HeroSection = () => (
           animate="animate"
           transition={{ duration: 1, delay: 0.3 }}
         >
- 
+
         </MotionDiv>
       </div>
     </div>
@@ -419,7 +423,7 @@ const TerminologyCard = ({ terminology, onBack }) => {
   const formatDoshaInvolvement = (dosha) => {
     if (!dosha) return 'Not specified';
     if (typeof dosha === 'string') return dosha;
-    
+
     let result = '';
     if (dosha.primary) result += `Primary: ${dosha.primary}`;
     if (dosha.secondary && dosha.secondary.length > 0) {
@@ -431,7 +435,7 @@ const TerminologyCard = ({ terminology, onBack }) => {
 
   const formatICD11Mappings = (mappings) => {
     if (!mappings) return null;
-    
+
     return (
       <div className="space-y-4">
         {mappings.tm2_code && (
@@ -617,9 +621,8 @@ const TerminologyCard = ({ terminology, onBack }) => {
                 <span className="font-medium">Last Updated: {terminology.last_updated ? new Date(terminology.last_updated).toLocaleDateString() : 'Not specified'}</span>
               </div>
               <div className="flex items-center space-x-4">
-                <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-                  terminology.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
+                <span className={`px-4 py-2 rounded-full text-sm font-bold ${terminology.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
                   {terminology.status === 'active' ? '✓ Active' : terminology.status || 'Unknown'}
                 </span>
                 <div className="flex items-center bg-orange-100 text-orange-800 px-4 py-2 rounded-full">
@@ -664,7 +667,7 @@ const App = () => {
       const resultsArray = Array.isArray(results) ? results : [];
       setSuggestions(resultsArray);
       setShowSuggestions(resultsArray.length > 0);
-      
+
       if (resultsArray.length > 0) {
         setSelectedSuggestion(0);
       }
@@ -723,13 +726,13 @@ const App = () => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedSuggestion(prev => 
+        setSelectedSuggestion(prev =>
           prev < suggestions.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedSuggestion(prev => 
+        setSelectedSuggestion(prev =>
           prev > 0 ? prev - 1 : suggestions.length - 1
         );
         break;
@@ -768,73 +771,73 @@ const App = () => {
     };
   }, [handleKeyDown]);
 
-return (
-  <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-    <Navbar 
-      onSearchFocus={handleSearchFocus}
-      searchTerm={searchTerm}
-      onSearchChange={setSearchTerm}
-      onLogoClick={handleBackToSearch}
-    />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      <Navbar
+        onSearchFocus={handleSearchFocus}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onLogoClick={handleBackToSearch}
+      />
 
-    {/* ✅ Always show suggestions under the Navbar */}
-    <div className="max-w-2xl mx-auto px-4 relative">
-      {(showSuggestions || isLoading) && (
-        <SuggestionList
-          suggestions={suggestions}
-          onSelect={handleSuggestionSelect}
-          selectedIndex={selectedSuggestion}
-          onKeyDown={handleKeyDown}
-          isLoading={isLoading}
-          searchTerm={searchTerm}
-        />
-      )}
-    </div>
+      {/* ✅ Always show suggestions under the Navbar */}
+      <div className="max-w-2xl mx-auto px-4 relative">
+        {(showSuggestions || isLoading) && (
+          <SuggestionList
+            suggestions={suggestions}
+            onSelect={handleSuggestionSelect}
+            selectedIndex={selectedSuggestion}
+            onKeyDown={handleKeyDown}
+            isLoading={isLoading}
+            searchTerm={searchTerm}
+          />
+        )}
+      </div>
 
-    {currentView === 'search' ? (
-      <>
-        {error && (
-          <div className="max-w-4xl mx-auto px-4 mt-8">
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
-              <div className="flex items-center">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
-                <div>
-                  <h3 className="font-semibold text-red-800 mb-1">Connection Error</h3>
-                  <span className="text-red-700">{error}</span>
+      {currentView === 'search' ? (
+        <>
+          {error && (
+            <div className="max-w-4xl mx-auto px-4 mt-8">
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+                <div className="flex items-center">
+                  <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
+                  <div>
+                    <h3 className="font-semibold text-red-800 mb-1">Connection Error</h3>
+                    <span className="text-red-700">{error}</span>
+                  </div>
                 </div>
               </div>
             </div>
+          )}
+
+          {!searchTerm && !error && (
+            <>
+              <HeroSection />
+              <StatsSection />
+            </>
+          )}
+        </>
+      ) : (
+        <TerminologyCard
+          terminology={selectedTerminology}
+          onBack={handleBackToSearch}
+        />
+      )}
+
+      <footer className="bg-white border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center">
+            <p className="text-gray-500 mb-2">
+              © {new Date().getFullYear()} Ministry of AYUSH — National Digital Health Mission
+            </p>
+            <p className="text-sm text-gray-400">
+              Empowering healthcare through traditional wisdom and modern technology
+            </p>
           </div>
-        )}
-
-        {!searchTerm && !error && (
-          <>
-            <HeroSection />
-            <StatsSection />
-          </>
-        )}
-      </>
-    ) : (
-      <TerminologyCard
-        terminology={selectedTerminology}
-        onBack={handleBackToSearch}
-      />
-    )}
-
-    <footer className="bg-white border-t mt-16">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center">
-          <p className="text-gray-500 mb-2">
-            © {new Date().getFullYear()} Ministry of AYUSH — National Digital Health Mission
-          </p>
-          <p className="text-sm text-gray-400">
-            Empowering healthcare through traditional wisdom and modern technology
-          </p>
         </div>
-      </div>
-    </footer>
-  </div>
-);
+      </footer>
+    </div>
+  );
 };
 
 export default App;
