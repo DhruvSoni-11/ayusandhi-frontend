@@ -30,7 +30,7 @@ const MotionDiv = ({ children, className, variants, initial, animate, exit, tran
 };
 
 // API Service
-const API_BASE_URL = 'https://namaste-te4u.onrender.com/api/v1/terminology';
+const API_BASE_URL = 'https://ayusandhi-backend.vercel.app/api/v1/terminology';
 
 const apiService = {
   search: async (query) => {
