@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, ArrowLeft, Book, Globe, Heart, Clock, Tag, FileText, TreePine, AlertCircle, Loader2, Shield, Award, Menu, X } from 'lucide-react';
 
-// Framer Motion simulation using CSS Animations
+// Framer Motion simulation using CSS animations
 const motionVariants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
