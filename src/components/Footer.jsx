@@ -78,7 +78,7 @@ const Footer = () => (
                 © {new Date().getFullYear()} Ministry of AYUSH — National Digital Health Mission
               </p>
               <p className="text-sm text-green-300">
-                Empowering healthcare through traditional wisdom and modern technology
+                Empowering healthcare through traditional wisdom and modern technology.
               </p>
             </div>
           </div>
