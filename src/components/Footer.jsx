@@ -1,5 +1,5 @@
 const Footer = () => (
-      <footer className="bg-gradient-to-r from-green-900 via-green-800 to-yellow-900 text-white relative overflow-hidden">
+      <footer className="bg-gradient-to-r from-green-900 via-green-800 to-yellow-900 text-white relative overflow-hidden pt-8">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div 
