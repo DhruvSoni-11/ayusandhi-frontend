@@ -100,24 +100,15 @@ const SupportPage = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <MotionDiv
-          className="text-center mb-16"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-6 py-3 rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-6 py-3 rounded-full">
             <HelpCircle className="w-5 h-5" />
             <span className="font-semibold">Support Center</span>
           </div>
-          
-          <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8 ayur-title">
-            How Can We <span className="text-green-700">Help You</span>?
-          </h1>
-          
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-            Find answers, get support, and learn how to make the most of AyuSandhi's 
-            comprehensive Ayurvedic terminology database.
-          </p>
 
           {/* Search Bar
           <div className="max-w-2xl mx-auto relative">

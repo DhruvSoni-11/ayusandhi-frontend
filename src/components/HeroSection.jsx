@@ -5,7 +5,7 @@ const HeroSection = () => (
   <div className="relative">
     {/* Background image */}
     <div
-      className="absolute inset-0 bg-cover bg-center opacity-100"
+      className="absolute inset-0 bg-cover bg-center opacity-100 "
       style={{ backgroundImage: "url('/ayurveda_image.png')" }}
     ></div>
 
