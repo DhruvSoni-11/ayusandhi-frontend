@@ -1,28 +1,38 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, ArrowLeft, Book, Globe, Heart, Clock, Tag, FileText, TreePine, AlertCircle, Loader2, Shield, Award, Menu, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { apiService } from './services/apiService';
 import Navbar from './components/Navbar';
-import MotionDiv from './components/MotionDiv';
 import useDebounce from './hooks/useDebounce';
 import SuggestionList from './components/SuggestionList';
 import HeroSection from './components/HeroSection';
 import TerminologyCard from './components/TerminologyCard';
 import StatsSection from './components/StatsSection';
 import Footer from './components/Footer';
+import SupportPage from './components/SupportPage';
 
-// Main App Component
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
   const [selectedTerminology, setSelectedTerminology] = useState(null);
-  const [currentView, setCurrentView] = useState('search');
+  const [currentView, setCurrentView] = useState('search'); // 'search', 'details', 'support', etc.
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 350);
 
+  // Navigation handler
+  const navigateToPage = (page) => {
+    setCurrentView(page);
+    setSelectedTerminology(null);
+    setSearchTerm('');
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setError(null);
+  };
+
+  // Search handler
   const handleSearch = useCallback(async (query) => {
     if (!query.trim() || query.trim().length < 2) {
       setSuggestions([]);
@@ -34,15 +44,11 @@ const App = () => {
     setError(null);
 
     try {
-      // Use the enhanced search that includes lookup functionality
       const results = await apiService.enhancedSearch(query);
       const resultsArray = Array.isArray(results) ? results : [];
       setSuggestions(resultsArray);
       setShowSuggestions(resultsArray.length > 0);
-
-      if (resultsArray.length > 0) {
-        setSelectedSuggestion(0);
-      }
+      if (resultsArray.length > 0) setSelectedSuggestion(0);
     } catch (err) {
       console.error('Enhanced search error:', err);
       setError('Unable to connect to the terminology database. Please check your internet connection and try again.');
@@ -63,6 +69,7 @@ const App = () => {
     }
   }, [debouncedSearchTerm, handleSearch]);
 
+  // Select suggestion
   const handleSuggestionSelect = async (suggestion) => {
     if (!suggestion.namaste_code) {
       setError('Invalid terminology selected. Missing NAMASTE code.');
@@ -74,12 +81,10 @@ const App = () => {
     setShowSuggestions(false);
 
     try {
-      // If the suggestion already has full details (from direct lookup), use it directly
       if (suggestion.definition || suggestion.clinical_features || suggestion.icd11_mappings) {
         setSelectedTerminology(suggestion);
         setCurrentView('details');
       } else {
-        // Otherwise, fetch full details
         const details = await apiService.lookup(suggestion.namaste_code);
         setSelectedTerminology(details);
         setCurrentView('details');
@@ -92,6 +97,7 @@ const App = () => {
     }
   };
 
+  // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
     if (!showSuggestions || suggestions.length === 0) return;
 
@@ -118,15 +124,20 @@ const App = () => {
         setShowSuggestions(false);
         setSelectedSuggestion(-1);
         break;
+      default:
+        break;
     }
   }, [showSuggestions, suggestions, selectedSuggestion, handleSuggestionSelect]);
 
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   const handleBackToSearch = () => {
-    setCurrentView('search');
-    setSelectedTerminology(null);
-    setSelectedSuggestion(-1);
-    setSearchTerm('');
-    setSuggestions([]);
+    navigateToPage('search');
   };
 
   const handleSearchFocus = () => {
@@ -136,25 +147,20 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      {/* Navbar */}
       <Navbar
         onSearchFocus={handleSearchFocus}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onLogoClick={handleBackToSearch}
+        onNavigate={navigateToPage}
       />
 
-      {/* Main Content Wrapper - REMOVED pt-28 to allow content to start at the top */}
-      <div className=""> 
-        {/* The suggestion list needs to be positioned absolutely relative to the viewport/main content */}
+      {/* Main Content */}
+      <div className="">
+        {/* Suggestion Box */}
         <div className="max-w-2xl mx-auto px-4 relative">
           {(showSuggestions || isLoading) && (
             <SuggestionList
@@ -168,6 +174,7 @@ const App = () => {
           )}
         </div>
 
+        {/* Views */}
         {currentView === 'search' ? (
           <>
             {error && (
@@ -183,25 +190,25 @@ const App = () => {
                 </div>
               </div>
             )}
-
             {!searchTerm && !error && (
               <>
-                {/* HeroSection will now start from the top of the viewport */}
                 <HeroSection />
                 <StatsSection />
               </>
             )}
           </>
-        ) : (
+        ) : currentView === 'support' ? (
+          <SupportPage onNavigate={navigateToPage} />
+        ) : currentView === 'details' && selectedTerminology ? (
           <TerminologyCard
             terminology={selectedTerminology}
             onBack={handleBackToSearch}
           />
-        )}
-      </div> 
+        ) : null}
+      </div>
 
-      <Footer />
-
+      {/* Footer */}
+      <Footer navigateToPage={navigateToPage} />
     </div>
   );
 };
