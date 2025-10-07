@@ -28,6 +28,7 @@ const SupportPage = ({ onNavigate }) => {
         }
       ]
     },
+
   ];
 
   const supportChannels = [

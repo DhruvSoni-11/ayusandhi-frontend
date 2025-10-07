@@ -27,6 +27,7 @@ const Footer = ({ navigateToPage }) => (
               <p className="text-green-200 text-sm">Traditional Wisdom Meets Modern Medicine</p>
             </div>
           </div>
+<<<<<<< HEAD
           <p className="text-green-100 leading-relaxed mb-6 max-w-md">
             Bridging ancient Ayurvedic knowledge with contemporary healthcare through 
             comprehensive terminology mapping and international standards compliance.
@@ -38,6 +39,18 @@ const Footer = ({ navigateToPage }) => (
             <span className="bg-white/20 px-3 py-1 rounded-full text-sm border border-white/30">
               WHO Compliant
             </span>
+=======
+
+          <div className="border-t border-white/20 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-green-200 mb-4 md:mb-0">
+                © {new Date().getFullYear()} Ministry of AYUSH — National Digital Health Mission
+              </p>
+              <p className="text-sm text-green-300">
+                Empowering healthcare through traditional wisdom and modern technology.
+              </p>
+            </div>
+>>>>>>> origin
           </div>
         </div>
 
