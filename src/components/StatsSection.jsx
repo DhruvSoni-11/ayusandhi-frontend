@@ -2,8 +2,16 @@ import React from 'react';
 import MotionDiv from './MotionDiv';
 
 const StatsSection = () => (
-  <div className="bg-white py-16 border-t border-gray-100">
-    <div className="max-w-6xl mx-auto px-4">
+  <div className="bg-white py-16 border-t border-gray-100 relative">
+    {/* Background Image */}
+    <div
+      className="absolute inset-0 bg-cover bg-center opacity-10"
+      style={{ backgroundImage: "url('./public/ayurveda_image.png')" ,
+            backgroundPosition: 'center top 86%',
+}}
+    />
+
+    <div className="max-w-6xl mx-auto px-4 relative z-10">
       <MotionDiv
         className="text-center mb-12"
         initial="initial"
