@@ -9,7 +9,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
   const [apiDropdownOpen, setApiDropdownOpen] = useState(false);
 
   // Ayurvedic-themed logo placeholder
-  const logoPlaceholderUrl = "https://placehold.co/40x40/2D5016/DAA520?text=🌿";
+  const logoPlaceholderUrl = "./public/logo.png"; // Replace with actual logo path
 
   const navigationItems = [
     {
@@ -142,7 +142,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
         {isMobileMenuOpen && (
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[95%] bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-green-200/50 mt-4 lg:hidden">
             {/* Mobile Search */}
-            <div className="relative mb-6">
+            <div className="relative mb-6 px-2">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500 w-5 h-5" />
               <input
                 type="text"
@@ -150,7 +150,8 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                 onChange={(e) => onSearchChange(e.target.value)}
                 onFocus={onSearchFocus}
                 placeholder="Search Ayurvedic terminology..."
-                className="w-full pl-12 pr-4 py-3 border-2 border-green-200 rounded-full focus:border-green-500 focus:outline-none transition-all bg-white font-medium"
+                className="w-full pl-12 pr-4 py-3 border border-green-300 rounded-full text-sm sm:text-base bg-white focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm transition"
+
               />
             </div>
 
