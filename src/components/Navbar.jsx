@@ -117,7 +117,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                     </button>
                     {apiDropdownOpen && (
                       <div
-                        className="absolute top-full mt-0.4 left-20 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
+                        className="absolute top-full mt-0.4 left-3 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
                         onMouseEnter={() => setApiDropdownOpen(true)}
                         onMouseLeave={() => setApiDropdownOpen(false)}
                       >
