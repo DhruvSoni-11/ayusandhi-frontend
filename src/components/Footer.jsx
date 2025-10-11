@@ -19,7 +19,7 @@ const Footer = ({ navigateToPage }) => (
         {/* Brand Column */}
         <div className="lg:col-span-1">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center overflow-hidden border-2 border-white">
+            <div className="w-14 h-12 bg-yellow-400 rounded-full flex items-center justify-center overflow-hidden border-2 border-white">
               <img src="/logo.png" alt="AyuSandhi Logo" className="w-8 h-8 object-contain" />
             </div>
 

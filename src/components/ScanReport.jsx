@@ -248,7 +248,7 @@ const ScanReport = () => {
                     setScanning(false);
                     setError(null);
                   }}
-                  className="text-green-600 text-sm font-semibold hover:text-green-800 transition-colors"
+                  className="text-green-600 text-sm font-semibold hover:text-green-800 hover:scale-105 transition-colors"
                 >
                   View Result
                 </button>
@@ -269,7 +269,7 @@ const ScanReport = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50 pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50 pt-30 pb-12">
       <div className="max-w-7xl mx-auto px-4">
         <MotionDiv className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-900 mb-4 ayur-title">Document Analysis</h1>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Menu, X, Book, Code, Globe, FileText, ChevronDown, Heart, FileScan, FileScanIcon, LucideScanLine } from 'lucide-react'; // Changed FileScanned to FileScan
 import MotionDiv from './MotionDiv';
 import ApiDocs from './ApiDocs';
+import useTypingEffect from '../hooks/useTypingEffect';
 
 const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,6 +34,11 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
       onClick: () => onNavigate && onNavigate('scan-document')
     }
   ];
+
+  const placeholderText = useTypingEffect([
+    'Search terminology...',
+    "try 'jwara' or 'NAM.002.016'..."
+  ]);
 
   return (
     <>
@@ -82,7 +88,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                     </button>
                     {apiDropdownOpen && (
                       <div
-                        className="absolute top-full mt-0.4 left-3 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
+                        className="absolute top-full mt-0.4 left-20 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
                         onMouseEnter={() => setApiDropdownOpen(true)}
                         onMouseLeave={() => setApiDropdownOpen(false)}
                       >
@@ -121,7 +127,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onFocus={onSearchFocus}
-                placeholder="Search Ayurvedic terminology..."
+                placeholder={placeholderText}
                 className="w-full pl-8 pr-4 px-4 py-4 border-2 border-green-100 rounded-full text-sm focus:border-green-500 focus:outline-none transition-all bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md font-medium placeholder-gray-600"
                 aria-label="Search medical terminology or lookup by code"
               />
