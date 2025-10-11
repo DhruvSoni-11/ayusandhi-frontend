@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Menu, X, Book, Code, Globe, FileText, ChevronDown, Leaf, Heart } from 'lucide-react';
+import { Search, Menu, X, Book, Code, Globe, FileText, ChevronDown, Heart, FileScan, FileScanIcon, LucideScanLine } from 'lucide-react'; // Changed FileScanned to FileScan
 import MotionDiv from './MotionDiv';
 import ApiDocs from './ApiDocs';
 
@@ -9,8 +9,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
   const [apiDropdownOpen, setApiDropdownOpen] = useState(false);
 
   // Ayurvedic-themed logo placeholder
-  const logoPlaceholderUrl = "./public/logo.png"; // Replace with actual logo path
-
+  const logoPlaceholderUrl = "./logo.png"; // Replace with actual logo path
   const navigationItems = [
     {
       label: 'Home',
@@ -29,9 +28,9 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
       ]
     },
     {
-      label: 'About Ayurveda',
-      icon: Leaf,
-      onClick: () => onNavigate && onNavigate('about-ayurveda')
+      label: 'Scan Document',
+      icon: LucideScanLine, // Changed FileScanned to FileScan
+      onClick: () => onNavigate && onNavigate('scan-document')
     }
   ];
 
@@ -48,11 +47,11 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
             transition={{ duration: 0.8 }}
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-yellow-500 rounded-full blur-sm opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <div className="absolute inset-0  rounded-full blur-sm opacity-80 group-hover:opacity-75 transition-opacity"></div>
               <img
                 src={logoPlaceholderUrl}
                 alt="AyuSandhi Logo"
-                className="relative h-10 w-10 object-contain drop-shadow-lg rounded-full border-2 border-white"
+                className="relative h-13 w-13 object-contain rounded-full"
                 onError={(e) => { e.target.onerror = null; e.target.src = logoPlaceholderUrl; }}
               />
             </div>
@@ -67,13 +66,13 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
           </MotionDiv>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-2">
             {navigationItems.map((item, index) => (
               <div key={index} className="relative group">
                 {item.hasDropdown ? (
                   <>
                     <button
-                      className="flex items-center gap-2 px-4 py-2 text-green-700 hover:text-green-900 font-medium transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-green-700 hover:text-green-900 hover:scale-105 font-medium transition-colors"
                       onMouseEnter={() => setApiDropdownOpen(true)}
                       onMouseLeave={() => setApiDropdownOpen(false)}
                     >
@@ -83,7 +82,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                     </button>
                     {apiDropdownOpen && (
                       <div
-                        className="absolute top-full mt-0.4 left-0 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
+                        className="absolute top-full mt-0.4 left-3 bg-white rounded-xl shadow-xl border border-green-100 p-2 min-w-48 z-10"
                         onMouseEnter={() => setApiDropdownOpen(true)}
                         onMouseLeave={() => setApiDropdownOpen(false)}
                       >
@@ -103,7 +102,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                 ) : (
                   <button
                     onClick={item.onClick}
-                    className="flex items-center gap-2 px-4 py-2 text-green-700 hover:text-green-900 font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-green-700 hover:text-green-900 hover:scale-105 font-medium transition-colors"
                   >
                     <item.icon className="w-4 h-4" />
                     {item.label}
@@ -123,7 +122,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
                 onChange={(e) => onSearchChange(e.target.value)}
                 onFocus={onSearchFocus}
                 placeholder="Search Ayurvedic terminology..."
-                className="w-full pl-12 pr-4 py-3 border-2 border-green-200 rounded-full text-sm focus:border-green-500 focus:outline-none transition-all bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md font-medium placeholder-green-400"
+                className="w-full pl-8 pr-4 px-4 py-4 border-2 border-green-100 rounded-full text-sm focus:border-green-500 focus:outline-none transition-all bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md font-medium placeholder-gray-600"
                 aria-label="Search medical terminology or lookup by code"
               />
             </div>

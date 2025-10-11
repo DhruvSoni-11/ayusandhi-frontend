@@ -9,6 +9,7 @@ import TerminologyCard from './components/TerminologyCard';
 import StatsSection from './components/StatsSection';
 import Footer from './components/Footer';
 import SupportPage from './components/SupportPage';
+import ScanReport from './components/ScanReport';
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -199,6 +200,8 @@ const App = () => {
           </>
         ) : currentView === 'support' ? (
           <SupportPage onNavigate={navigateToPage} />
+        ) : currentView === 'scan-document' ? (
+          <ScanReport />
         ) : currentView === 'details' && selectedTerminology ? (
           <TerminologyCard
             terminology={selectedTerminology}
