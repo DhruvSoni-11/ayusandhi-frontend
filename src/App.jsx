@@ -10,6 +10,11 @@ import StatsSection from './components/StatsSection';
 import Footer from './components/Footer';
 import SupportPage from './components/SupportPage';
 import ScanReport from './components/ScanReport';
+import ApiDocs from './components/ApiDocs';
+
+// New imports for the requested pages
+import AboutAyurveda from './components/AboutAyurveda';
+import UnderDevelopment from './components/UnderDevelopment';
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -191,15 +196,19 @@ const App = () => {
                 </div>
               </div>
             )}
-            {!searchTerm && !error && (
-              <>
-                <HeroSection />
-                <StatsSection />
-              </>
-            )}
+            {!error && (
+  <>
+    <HeroSection />
+    <StatsSection />
+  </>
+)}
           </>
         ) : currentView === 'support' ? (
           <SupportPage onNavigate={navigateToPage} />
+        ) : currentView === 'api-docs' ? (
+          // pass onNavigate so ApiDocs can fallback to navigate back when onClose isn't provided
+          <ApiDocs onNavigate={navigateToPage} />
+
         ) : currentView === 'scan-document' ? (
           <ScanReport />
         ) : currentView === 'details' && selectedTerminology ? (
@@ -207,6 +216,12 @@ const App = () => {
             terminology={selectedTerminology}
             onBack={handleBackToSearch}
           />
+        ) : currentView === 'about-ayurveda' ? (
+          // Render AboutAyurveda (it's a modal component that expects onClose)
+          <AboutAyurveda onClose={() => navigateToPage('search')} />
+        ) : currentView === 'research' || currentView === 'collaboration' || currentView === 'benefits' ? (
+          // Render UnderDevelopment for research, institutional access and benefits pages
+          <UnderDevelopment />
         ) : null}
       </div>
 

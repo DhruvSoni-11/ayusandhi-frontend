@@ -8,6 +8,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showApiDocs, setShowApiDocs] = useState(false);
   const [apiDropdownOpen, setApiDropdownOpen] = useState(false);
+  const [initialSection, setInitialSection] = useState('overview'); // Added initialSection state
 
   // Ayurvedic-themed logo placeholder
   const logoPlaceholderUrl = "./logo.png"; // Replace with actual logo path
@@ -22,10 +23,38 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
       hasDropdown: true,
       icon: Code,
       dropdownItems: [
-        { label: 'API Overview', icon: Book, onClick: () => setShowApiDocs(true) },
-        { label: 'Endpoints', icon: Code, onClick: () => setShowApiDocs(true) },
-        { label: 'Authentication', icon: Globe, onClick: () => setShowApiDocs(true) },
-        { label: 'Code Examples', icon: FileText, onClick: () => setShowApiDocs(true) }
+        { 
+          label: 'API Overview', 
+          icon: Book, 
+          onClick: () => {
+            setShowApiDocs(true);
+            setInitialSection('overview');
+          }
+        },
+        { 
+          label: 'Endpoints', 
+          icon: Code, 
+          onClick: () => {
+            setShowApiDocs(true);
+            setInitialSection('endpoints');
+          }
+        },
+        { 
+          label: 'Authentication', 
+          icon: Globe, 
+          onClick: () => {
+            setShowApiDocs(true);
+            setInitialSection('authentication');
+          }
+        },
+        { 
+          label: 'Code Examples', 
+          icon: FileText, 
+          onClick: () => {
+            setShowApiDocs(true);
+            setInitialSection('examples');
+          }
+        }
       ]
     },
     {
@@ -37,7 +66,7 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
 
   const placeholderText = useTypingEffect([
     'Search terminology...',
-    "try 'jwara' or 'NAM.002.016'..."
+    "Try 'jwara' or 'NAM.002.016'..."
   ]);
 
   return (
@@ -53,11 +82,11 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
             transition={{ duration: 0.8 }}
           >
             <div className="relative">
-              <div className="absolute inset-0  rounded-full blur-sm opacity-80 group-hover:opacity-75 transition-opacity"></div>
+              <div className="absolute inset-0 blur-sm opacity-80 group-hover:opacity-75 transition-opacity"></div>
               <img
                 src={logoPlaceholderUrl}
                 alt="AyuSandhi Logo"
-                className="relative h-13 w-13 object-contain rounded-full"
+                className="relative h-13 w-13 object-contain "
                 onError={(e) => { e.target.onerror = null; e.target.src = logoPlaceholderUrl; }}
               />
             </div>
@@ -215,7 +244,13 @@ const Navbar = ({ onSearchFocus, searchTerm, onSearchChange, onLogoClick, onNavi
 
       {/* API Documentation Modal */}
       {showApiDocs && (
-        <ApiDocs onClose={() => setShowApiDocs(false)} />
+        <ApiDocs 
+          onClose={() => {
+            setShowApiDocs(false);
+            setInitialSection('overview'); // Reset when closing
+          }} 
+          initialSection={initialSection}
+        />
       )}
     </>
   );

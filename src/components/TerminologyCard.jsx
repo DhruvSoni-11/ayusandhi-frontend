@@ -68,7 +68,7 @@ const TerminologyCard = ({ terminology, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-12">
+    <div className="min-h-screen bg-gray-50 pt-16">
       <div className="max-w-6xl mx-auto px-4">
         <MotionDiv
           initial="initial"
@@ -77,7 +77,7 @@ const TerminologyCard = ({ terminology, onBack }) => {
         >
           <button
             onClick={onBack}
-            className="flex items-center text-orange-600 hover:text-orange-800 mb-8 transition-colors font-medium"
+            className="flex -ml-40 text-orange-600 hover:text-orange-800 mb-8 transition-colors font-medium"
             aria-label="Back to search"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />

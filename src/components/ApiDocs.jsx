@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Book, Code, Globe, Search, FileText, Download, ExternalLink, Copy, CheckCircle } from 'lucide-react';
 import MotionDiv from './MotionDiv';
 
-const ApiDocs = ({ onClose }) => {
-  const [activeSection, setActiveSection] = useState('overview');
+const ApiDocs = ({ onClose, initialSection = 'overview', onNavigate }) => {
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [copiedCode, setCopiedCode] = useState('');
+
+  // Use useEffect to handle section changes
+  useEffect(() => {
+    setActiveSection(initialSection);
+  }, [initialSection]);
+
+  // fallback close handler: prefer onClose, otherwise use onNavigate to go back to search
+  const handleClose = () => {
+    if (typeof onClose === 'function') {
+      onClose();
+    } else if (typeof onNavigate === 'function') {
+      onNavigate('search');
+    }
+  };
 
   const copyToClipboard = async (text, id) => {
     try {
@@ -427,7 +441,7 @@ curl -X GET "https://ayusandhi-backend.vercel.app/api/v1/terminology/search?quer
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-green-800 ayur-title">API Documentation</h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-gray-500 hover:text-gray-700 transition-colors"
             >
               ✕

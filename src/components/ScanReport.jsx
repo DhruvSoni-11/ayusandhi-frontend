@@ -3,6 +3,7 @@ import { Upload, Download, History, Loader, FileScan, RotateCw, FileText, CheckC
 import MotionDiv from './MotionDiv';
 
 const ScanReport = () => {
+  // Add proper state management
   const [file, setFile] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
@@ -17,19 +18,23 @@ const ScanReport = () => {
     }
   });
 
-  useEffect(() => {
+  // Add error boundary
+  const handleFileSelect = async (event) => {
     try {
-      localStorage.setItem('scanHistory', JSON.stringify(history));
-    } catch (error) {
-      console.error('Error saving scan history:', error);
-    }
-  }, [history]);
+      const selectedFile = event.target.files[0];
+      if (!selectedFile) return;
 
-  const handleFileSelect = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        throw new Error('Invalid file type. Please upload PDF, DOC, DOCX, or image files.');
+      }
+
       setFile(selectedFile);
-      handleUpload(selectedFile);
+      await handleUpload(selectedFile);
+    } catch (err) {
+      setError(err.message);
+      console.error('File selection error:', err);
     }
   };
 
@@ -49,44 +54,35 @@ const ScanReport = () => {
 
       if (!response.ok) {
         throw new Error(`Upload failed with status: ${response.status}`);
-        <p>Refresh the page</p>
       }
 
       const result = await response.json();
+      
+      // Validate API response
+      if (!result || !result.downloadUrl) {
+        throw new Error('Invalid response from server');
+      }
 
-      // Create history entry
       const historyEntry = {
-        id: Date.now(),
-        fileName: selectedFile.name,
+        id: `scan_${Date.now()}`,
+        fileName: `report_${selectedFile.name}`,
         timestamp: new Date().toISOString(),
         downloadUrl: result.downloadUrl,
         result: result
       };
 
-      // Update history state with new entry
-      setHistory(prevHistory => {
-        const newHistory = [historyEntry, ...prevHistory.slice(0, 9)]; // Keep last 10 entries
-        return newHistory;
-      });
+      setHistory(prev => [historyEntry, ...prev.slice(0, 9)]);
+      setScanResult(result);
 
-      setScanResult({
-        ...result,
-        fileName: selectedFile.name,
-        downloadUrl: result.downloadUrl
-      });
+      // Save to localStorage
+      localStorage.setItem('scanHistory', JSON.stringify([historyEntry, ...history.slice(0, 9)]));
 
     } catch (err) {
-      console.error('Scan error:', err);
       setError(err.message || 'Failed to scan document. Please try again.');
+      console.error('Scan error:', err);
     } finally {
       setScanning(false);
     }
-  };
-
-  const handleAnotherScan = () => {
-    setFile(null);
-    setScanResult(null);
-    setError(null);
   };
 
   const handleDownload = async () => {
@@ -96,36 +92,22 @@ const ScanReport = () => {
     }
 
     try {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = scanResult.downloadUrl;
+      const response = await fetch(scanResult.downloadUrl);
+      if (!response.ok) throw new Error('Download failed');
 
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-
-      // Use the simplified file name
-      canvas.toBlob((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `EMR-Report_${scanResult.fileName}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }, 'image/png');
-
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${file.name}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
+      setError('Failed to download file: ' + err.message);
       console.error('Download error:', err);
-      setError('Failed to download file. Please try again.');
     }
   };
 
