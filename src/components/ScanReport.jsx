@@ -71,11 +71,18 @@ const ScanReport = () => {
         result: result
       };
 
-      setHistory(prev => [historyEntry, ...prev.slice(0, 9)]);
-      setScanResult(result);
+      // update history atomically and persist
+      setHistory(prev => {
+        const newHist = [historyEntry, ...prev.slice(0, 9)];
+        try {
+          localStorage.setItem('scanHistory', JSON.stringify(newHist));
+        } catch (e) {
+          console.error('Failed to save scan history:', e);
+        }
+        return newHist;
+      });
 
-      // Save to localStorage
-      localStorage.setItem('scanHistory', JSON.stringify([historyEntry, ...history.slice(0, 9)]));
+      setScanResult(result);
 
     } catch (err) {
       setError(err.message || 'Failed to scan document. Please try again.');
@@ -85,14 +92,18 @@ const ScanReport = () => {
     }
   };
 
-  const handleDownload = async () => {
-    if (!scanResult?.downloadUrl) {
+  // support downloading either current scanResult or a history item passed in
+  const handleDownload = async (entry) => {
+    const downloadUrl = entry?.downloadUrl || scanResult?.downloadUrl;
+    const downloadFileName = entry?.fileName || (file?.name ? `report_${file.name}` : 'report.pdf');
+
+    if (!downloadUrl) {
       setError('Download URL is not available');
       return;
     }
 
     try {
-      const response = await fetch(scanResult.downloadUrl);
+      const response = await fetch(downloadUrl);
       if (!response.ok) throw new Error('Download failed');
 
       const blob = await response.blob();
@@ -100,13 +111,13 @@ const ScanReport = () => {
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = `report_${file.name}`;
+      a.download = downloadFileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError('Failed to download file: ' + err.message);
+      setError('Failed to download file: ' + (err.message || err));
       console.error('Download error:', err);
     }
   };
@@ -114,6 +125,14 @@ const ScanReport = () => {
   const clearHistory = useCallback(() => {
     setHistory([]);
     localStorage.removeItem('scanHistory');
+  }, []);
+
+  // NEW: reset UI to allow scanning another document
+  const handleAnotherScan = useCallback(() => {
+    setFile(null);
+    setScanning(false);
+    setScanResult(null);
+    setError(null);
   }, []);
 
   const renderInitialState = () => (
@@ -168,7 +187,7 @@ const ScanReport = () => {
       </div>
       <div className="space-y-4 w-full max-w-sm">
         <button
-          onClick={handleDownload}
+          onClick={() => handleDownload()}
           className="w-full bg-green-600 text-white px-8 py-4 rounded-full hover:bg-green-700 transition-all duration-300 inline-flex items-center justify-center gap-3 text-lg font-semibold shadow-lg hover:shadow-xl"
           disabled={!scanResult?.downloadUrl}
         >
