@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Upload, Download, History, Loader, FileScan, RotateCw, FileText, CheckCircle } from 'lucide-react';
 import MotionDiv from './MotionDiv';
+import PinnedNote from './PinnedNote';
 
 const ScanReport = () => {
   // Add proper state management
@@ -57,7 +58,7 @@ const ScanReport = () => {
       }
 
       const result = await response.json();
-      
+
       // Validate API response
       if (!result || !result.downloadUrl) {
         throw new Error('Invalid response from server');
@@ -108,7 +109,7 @@ const ScanReport = () => {
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      
+
       const a = document.createElement('a');
       a.href = url;
       a.download = downloadFileName;
@@ -292,6 +293,12 @@ const ScanReport = () => {
               </div>
             )}
           </MotionDiv>
+          {/* 🔹 Add the pinned note here */}
+            <PinnedNote
+              imageSrc="/notification-image.png"
+              downloadName="Important_Info.png"
+            />
+
 
           {/* History Section */}
           <MotionDiv className="lg:col-span-1">
